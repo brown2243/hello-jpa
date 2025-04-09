@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import hello.jpa.domain.Member;
 import hello.jpa.domain.Order;
+import hello.jpa.domain.Team;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -22,11 +23,27 @@ public class JpaRunner implements CommandLineRunner {
   public void run(String... args) throws Exception {
     // 실행 시점에 동작할 코드
     System.out.println("JpaRunner START!!!!!");
+    Team team1 = new Team();
+    team1.setName("team1");
+    Team team2 = new Team();
+    team2.setName("team2");
 
-    Order order = em.find(Order.class, 1L);
-    Member member = em.find(Member.class, 1L);
-    // member.
-    order.getMember();
+    Member member = new Member();
+    member.setName("member1");
+    member.setTeam(team1);
+    em.persist(team1);
+    em.persist(team2);
+    em.persist(member);
+
+    member.setTeam(team2);
+    // 조회
+    // Member member = em.find(Member.class, 1L);
+    // Team team2 = em.find(Team.class, 2L);
+
+    // System.out.println(member.getTeam().getName());
+    // // 회원1에 새로운 팀B 설정
+    // member.setTeam(team2);
+    // System.out.println(member.getTeam().getName());
 
     // List<Member> members = em.createQuery("select m from Member m", Member.class)
     // .setFirstResult(1)

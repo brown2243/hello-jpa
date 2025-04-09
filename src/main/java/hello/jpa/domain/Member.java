@@ -1,16 +1,11 @@
 package hello.jpa.domain;
 
-import java.time.LocalDateTime;
-
-import hello.jpa.enums.RoleType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,20 +17,11 @@ import lombok.Setter;
 public class Member {
   @Id
   @GeneratedValue
-  @Column(name = "member_id")
   private Long id;
 
   private String name;
-  private String city;
-  private String street;
-  private String zipcode;
 
-  @Enumerated(EnumType.STRING)
-  private RoleType roleType;
-
-  private LocalDateTime createdDate;
-  private LocalDateTime lastModifiedDate;
-
-  @Lob
-  private String description;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "team_id")
+  Team team;
 }
