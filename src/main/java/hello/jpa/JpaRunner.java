@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import hello.jpa.domain.Member;
+import hello.jpa.domain.Order;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -22,14 +23,20 @@ public class JpaRunner implements CommandLineRunner {
     // 실행 시점에 동작할 코드
     System.out.println("JpaRunner START!!!!!");
 
-    List<Member> members = em.createQuery("select m from Member m", Member.class)
-        .setFirstResult(1)
-        .setMaxResults(8)
-        .getResultList();
+    Order order = em.find(Order.class, 1L);
+    Member member = em.find(Member.class, 1L);
+    // member.
+    order.getMember();
 
-    for (Member member : members) {
-      System.out.println("member.name = " + member.getName());
-    }
+    // List<Member> members = em.createQuery("select m from Member m", Member.class)
+    // .setFirstResult(1)
+
+    // .setMaxResults(8)
+    // .getResultList();
+
+    // for (Member member : members) {
+    // System.out.println("member.name = " + member.getUsername());
+    // }
 
     // Member member = em.find(Member.class, 1L);
     // member.setName("hello JPA");

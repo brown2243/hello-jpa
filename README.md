@@ -339,3 +339,230 @@ List<Member> members = em.createQuery("select m from Member m", Member.class).ge
 - em.detach(): 특정 엔티티만
 - em.clear(): 컨텍스트 초기화
 - em.close(): 컨텍스트 종료
+
+# 5. 엔티티 매핑
+
+## 객체와 테이블 매핑
+
+- 객체와 테이블 매핑: @`Entity`, `@Table`
+- 필드와 컬럼 매핑: `@Column`
+- 기본 키 매핑: `@Id`
+- 연관관계 매핑: `@ManyToOne`,`@JoinColumn`
+
+### @Entity
+
+- @Entity가 붙은 클래스는 JPA가 관리, 엔티티라 한다.
+- JPA를 사용해서 테이블과 매핑할 클래스는 @Entity 필수
+- 주의
+  - 기본 생성자 필수(파라미터가 없는 public 또는 protected 생성자)
+  - final 클래스, enum, interface, inner 클래스 사용X
+  - 저장할 필드에 final 사용 X
+
+### @Entity 속성 정리
+
+- 속성: name
+- JPA에서 사용할 엔티티 이름을 지정한다.
+- 기본값: 클래스 이름을 그대로 사용(예: Member)
+- 같은 클래스 이름이 없으면 가급적 기본값을 사용한다.
+
+- @Table은 엔티티와 매핑할 테이블 지정
+
+## 데이터베이스 스키마 자동 생성
+
+- DDL을 애플리케이션 실행 시점에 자동 생성
+- 테이블 중심 -> 객체 중심
+- 데이터베이스 방언을 활용해서 데이터베이스에 맞는 적절한 DDL 생성
+- 이렇게 생성된 DDL은 개발 장비에서만 사용
+- 생성된 DDL은 운영서버에서는 사용하지 않거나, 적절히 다듬은 후 사용
+
+### 데이터베이스 스키마 자동 생성 - 속성
+
+`hibernate.ddl-auto`
+
+- create: 기존테이블 삭제 후 다시 생성 (DROP + CREATE)
+- create-drop: create와 같으나 종료시점에 테이블 DROP
+- update: 변경분만 반영(운영DB에는 사용하면 안됨)
+- validate: 엔티티와 테이블이 정상 매핑되었는지만 확인
+- none: 사용하지 않음(관례상)
+
+### 데이터베이스 스키마 자동 생성 - 주의
+
+- **운영 장비에는 절대 create, create-drop, update 사용하면 안된다.**
+- 개발 초기 단계는 create 또는 update
+- 테스트 서버는 update 또는 validate
+- **스테이징과 운영 서버는 validate 또는 none**
+
+- **로컬아니면 그냥 쓰지마라!!!**
+- **스크립트짜서 직접 적용해라**
+- alter query는 해당 테이블에 락이 걸리는데, 그동안 서비스가 중단될 수 있다.
+
+### DDL 생성 기능
+
+- 제약조건 추가: 회원 이름은 필수, 10자 초과X
+- @Column(nullable = false, length = 10)
+- 유니크 제약조건 추가
+- @Table(uniqueConstraints = {@UniqueConstraint( name = "NAME_AGE_UNIQUE",
+  columnNames = {"NAME", "AGE"} )})
+- DDL 생성 기능은 DDL을 자동 생성할 때만 사용되고
+  JPA의 실행 로직에는 영향을 주지 않는다.
+
+### ✅ 운영 환경에서 스키마 변경하는 방법
+
+#### 1. **DDL 스크립트를 수동으로 작성하거나 자동 생성**
+
+- 개발 환경에서 `create` 또는 `update` 옵션을 설정하고 테스트 DB에서 Hibernate가 생성한 DDL을 확인
+- `spring.jpa.show-sql=true`, `spring.jpa.properties.hibernate.format_sql=true` 옵션으로 쿼리 로그를 예쁘게 출력
+- 또는 `schema-generation.scripts.create-target` 옵션을 써서 Hibernate로부터 DDL 스크립트를 생성 가능
+
+```properties
+spring.jpa.generate-ddl=true
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.properties.javax.persistence.schema-generation.scripts.action=create
+spring.jpa.properties.javax.persistence.schema-generation.scripts.create-target=ddl/create.sql
+```
+
+---
+
+#### 2. **DBA 또는 개발자가 직접 스크립트 검토**
+
+- 테이블 락, 인덱스 생성 비용 등 고려
+- 위험한 `alter table`은 업무 시간 외나 배포창구에서 실행
+- 스크립트는 형상관리(Git 등)에 포함
+
+---
+
+#### 3. **버전 관리 도구 사용 (🛠️ 추천!)**
+
+**[Flyway](https://flywaydb.org/) 또는 Liquibase**를 이용하면 스키마 변경을 코드처럼 관리 가능
+
+#### 예: Flyway
+
+- `resources/db/migration` 폴더에 `V1__create_user_table.sql`처럼 작성
+- 애플리케이션 시작 시 자동 적용되거나, CLI/CI에서 수동 적용
+
+### 👉 실무에서는 다음을 추천
+
+- 개발 단계에서 DDL 미리 확인
+- 변경 사항을 DDL로 작성
+- Flyway/Liquibase 같은 도구로 관리
+- 운영 배포 전에 DBA와 리뷰 및 테스트
+
+## 필드와 컬럼 매핑
+
+### 매핑 어노테이션 정리
+
+- `@Column`: 컬럼 매핑
+- `@Temporal`: 날짜 타입 매핑
+- `@Enumerated`: enum 타입 매핑
+- `@Lob`: BLOB, CLOB 매핑
+- `@Transient`: 특정 필드를 컬럼에 매핑하지 않음(매핑 무시) - 메모리에서만 사용
+
+### @Column
+
+- name: 필드와 매핑할 테이블의 컬럼 이름 객체의 필드 이름
+- insertable,updatable: 등록, 변경 가능 여부
+- nullable(DDL) null 값의 허용 여부를 설정한다.
+  - false로 설정하면 DDL 생성 시에 not null 제약조건이 붙는다.
+- unique(DDL) @Table의 uniqueConstraints와 같지만 한 컬럼에 간단히 유니크 제약조건을 걸 때 사용한다.
+- columnDefinition(DDL) 데이터베이스 컬럼 정보를 직접 줄 수 있다.
+  - ex) varchar(100) default ‘EMPTY'
+- length(DDL) 문자 길이 제약조건, String 타입에만 사용한다.
+  - 255
+- precision,scale(DDL): BigDecimal 타입에서 사용한다(BigInteger도 사용할 수 있다).
+  - precision은 소수점을 포함한 전체 자 릿수를, scale은 소수의 자릿수
+  - 참고로 double, float 타입에는 적용되지 않는다. 아주 큰 숫자나 정밀한 소수를 다루어야 할 때만 사용한다.
+  - precision=19,scale=2
+
+### @Enumerated
+
+- 자바 enum 타입을 매핑할 때 사용
+- 주의! ORDINAL 사용X
+- EnumType.ORDINAL: enum 순서를 데이터베이스에 저장(기본값)
+- EnumType.STRING: enum 이름을 데이터베이스에 저장
+
+### @Temporal
+
+- 날짜 타입(java.util.Date, java.util.Calendar)을 매핑할 때 사용
+  - 과거
+- LocalDate(날짜만), LocalDateTime(날짜 + 시간), Instant(타임스탬프)을 사용할 때는 생략 가능(최신 하이버네이트 지원)
+  - 권장 타입
+
+### @Lob
+
+- 데이터베이스 BLOB, CLOB 타입과 매핑
+- @Lob에는 지정할 수 있는 속성이 없다.
+- 매핑하는 필드 타입이 문자면 CLOB 매핑, 나머지는 BLOB 매핑
+- CLOB: String, char[], java.sql.CLOB
+- BLOB: byte[], java.sql. BLOB
+
+### @Transient
+
+- 필드 매핑X
+
+## 기본 키 매핑
+
+### 기본 키 매핑 어노테이션
+
+- @Id
+  - 직접 할당
+- @GeneratedValue
+  - 자동할당
+  - IDENTITY: 데이터베이스에 위임, MYSQL(auto increament)
+  - SEQUENCE: 데이터베이스 시퀀스 오브젝트 사용, ORACLE
+  - @SequenceGenerator 필요
+  - TABLE: 키 생성용 테이블 사용, 모든 DB에서 사용
+  - @TableGenerator 필요
+  - AUTO: 방언에 따라 자동 지정, 기본값
+
+### 권장하는 식별자 전략
+
+- 기본 키 제약 조건:
+  - null 아님,
+  - 유일,
+  - 변하면 안된다.
+- 미래까지 이 조건을 만족하는 자연키는 찾기 어렵다.
+  - 대리키(대체키)를 사용하자.
+  - 비즈니스와 상관없는 값을 사용하라
+  - 예를 들어 주민등록번호도 기본 키로 적절하기 않다.
+- 권장: Long형 + 대체키 + 키 생성전략 사용
+  - 스노우 플레이크
+
+### IDENTITY 전략 - 특징
+
+- 기본 키 생성을 데이터베이스에 위임
+- 주로 MySQL, PostgreSQL, SQL Server, DB2에서 사용 (예: MySQL의 AUTO_INCREMENT)
+- JPA는 보통 트랜잭션 커밋 시점에 INSERT SQL 실행
+- AUTO_INCREMENT는 **데이터베이스에 INSERT SQL을 실행한 이후에 ID 값을 알 수 있음**
+- IDENTITY 전략은 em.persist() 시점에 즉시 **INSERT SQL 실행하고 DB에서 식별자를 조회**
+  - insert 시점에 id를 jdbc driver에서 알려줌(추가적 select 필요x)
+- **모아서 insert하는게 불가능**
+  - 일반적으로 성능에 유의미한 단점은 아니다.
+
+### SEQUENCE 전략 - 특징
+
+- 데이터베이스 시퀀스는 유일한 값을 순서대로 생성하는 특별한 데이터베이스 오브젝트(예: 오라클 시퀀스)
+- 오라클, PostgreSQL, DB2, H2 데이터베이스에서 사용
+- 미리 시퀀스테이블에서 next pk 받아옴
+- 그 후 commit 시점에 flush
+- 시퀀스 테이블에서 매번 받아오는 부분을 최적화
+  - 한번의 요청으로 allocationSize(기본값 50)만큼, 다음 pk를 미리 받아옴
+  - 즉, DB 시퀀스는 1, 2, 3, … 하나씩만 올라가지만, Hibernate는 그걸 allocationSize만큼 묶어서 캐싱
+  - **DB 시퀀스와 allocationSize는 반드시 맞춰야 함**
+    - 데이터베이스 시퀀스 값이 하나씩 증가하도록 설정되어 있으면 이 값을 반드시 1로 설정
+
+## 실전 예제 - 1. 요구사항 분석과 기본 매핑
+
+- 아티팩트(artifact)란 빌드 결과물로 만들어지는 JAR, WAR 등의 파일 이름
+- spring boot에서는 프로젝트 이름
+
+- 제약조건은 엔티티에 다 적는게 나중에 찾기 좋음
+- DB칼럼과, 자바 컨벤션 네이밍의 불일치
+  - 스프링부트 하이버네이트 설정에서 관례를 바꿀 수 있음
+  - **자바의 카멜케이스를 읽어서 언더스코어로 부트가 바꿔줌(기본 ㄷㄷㄷㄷㄷ)**
+
+### 데이터 중심 설계의 문제점
+
+- 현재 방식은 객체 설계를 테이블 설계에 맞춘 방식
+- 테이블의 외래키를 객체에 그대로 가져옴
+- 객체 그래프 탐색이 불가능
+- 참조가 없으므로 UML도 잘못됨

@@ -2,7 +2,7 @@ package hello.jpa.domain;
 
 import java.time.LocalDateTime;
 
-import hello.jpa.enums.RoleType;
+import hello.jpa.enums.OrderStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +10,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,23 +21,21 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Member {
+@Table(name = "ORDERS")
+public class Order {
   @Id
   @GeneratedValue
-  @Column(name = "member_id")
+  @Column(name = "order_id")
   private Long id;
 
-  private String name;
-  private String city;
-  private String street;
-  private String zipcode;
+  private LocalDateTime orderedDate;
 
   @Enumerated(EnumType.STRING)
-  private RoleType roleType;
+  private OrderStatus status;
 
-  private LocalDateTime createdDate;
-  private LocalDateTime lastModifiedDate;
+  @ManyToOne
+  Member member;
 
-  @Lob
-  private String description;
+  // @OneToMany
+  // OrderItem[] OrderItems;
 }
