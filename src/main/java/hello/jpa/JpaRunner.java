@@ -22,20 +22,13 @@ public class JpaRunner implements CommandLineRunner {
   @Transactional
   public void run(String... args) throws Exception {
     // 실행 시점에 동작할 코드
-    System.out.println("JpaRunner START!!!!!");
-    Team team1 = new Team();
-    team1.setName("team1");
-    Team team2 = new Team();
-    team2.setName("team2");
 
-    Member member = new Member();
-    member.setName("member1");
-    member.setTeam(team1);
-    em.persist(team1);
-    em.persist(team2);
-    em.persist(member);
+    Member member = em.find(Member.class, 1L);
 
-    member.setTeam(team2);
+    for (Member m : member.getTeam().getMembers()) {
+      System.out.println("m" + m.getName());
+    }
+
     // 조회
     // Member member = em.find(Member.class, 1L);
     // Team team2 = em.find(Team.class, 2L);
