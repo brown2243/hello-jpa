@@ -6,9 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import hello.jpa.domain.Member;
-import hello.jpa.domain.Order;
-import hello.jpa.domain.Team;
+import hello.jpa.domain.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -26,12 +24,6 @@ public class JpaRunner implements CommandLineRunner {
     Member member = new Member();
     member.setName("1234");
     em.persist(member);
-
-    Team team = new Team();
-    team.setName("teamAA");
-    // team.getMembers().add(member);
-    member.setTeam(team);
-    em.persist(team);
 
     // for (Member m : member.getTeam().getMembers()) {
     // System.out.println("m" + m.getName());
