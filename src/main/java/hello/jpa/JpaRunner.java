@@ -23,11 +23,19 @@ public class JpaRunner implements CommandLineRunner {
   public void run(String... args) throws Exception {
     // 실행 시점에 동작할 코드
 
-    Member member = em.find(Member.class, 1L);
+    Member member = new Member();
+    member.setName("1234");
+    em.persist(member);
 
-    for (Member m : member.getTeam().getMembers()) {
-      System.out.println("m" + m.getName());
-    }
+    Team team = new Team();
+    team.setName("teamAA");
+    // team.getMembers().add(member);
+    member.setTeam(team);
+    em.persist(team);
+
+    // for (Member m : member.getTeam().getMembers()) {
+    // System.out.println("m" + m.getName());
+    // }
 
     // 조회
     // Member member = em.find(Member.class, 1L);

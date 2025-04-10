@@ -1,6 +1,8 @@
 package hello.jpa.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import hello.jpa.enums.OrderStatus;
 import jakarta.persistence.Column;
@@ -25,18 +27,23 @@ import lombok.Setter;
 @Table(name = "ORDERS")
 public class Order {
   @Id
-  @GeneratedValue
-  @Column(name = "order_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private LocalDateTime orderedDate;
+  private LocalDateTime ordereDate;
 
   @Enumerated(EnumType.STRING)
   private OrderStatus status;
 
+  @JoinColumn(name = "member_id")
   @ManyToOne
   Member member;
 
-  // @OneToMany
-  // OrderItem[] OrderItems;
+  @OneToMany(mappedBy = "order")
+  List<OrderItem> orderItems = new ArrayList<>();
+
+  public void addOrderItems(OrderItem orderItem) {
+    orderItems.add(orderItem);
+    orderItem.setOrder(this);
+  }
 }
