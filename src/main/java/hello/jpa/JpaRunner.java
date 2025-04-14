@@ -19,11 +19,19 @@ public class JpaRunner implements CommandLineRunner {
   @Override
   @Transactional
   public void run(String... args) throws Exception {
-    // 실행 시점에 동작할 코드
 
-    Member member = new Member();
-    member.setName("1234");
-    em.persist(member);
+    Movie movie = new Movie();
+    movie.setDirector("AAAA");
+    movie.setActor("BBBB");
+    movie.setName("바람과 함께 사라지다");
+    movie.setPrice(10000L);
+
+    em.persist(movie);
+
+    em.flush();
+    em.clear();
+
+    Movie findMovie = em.find(Movie.class, movie.getId());
 
     // for (Member m : member.getTeam().getMembers()) {
     // System.out.println("m" + m.getName());
