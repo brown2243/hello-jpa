@@ -1,10 +1,11 @@
 package hello.jpa.domain;
 
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,13 +14,17 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class Item {
-  @Id
-  @GeneratedValue
-  private Long id;
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn
+// public class Item extends BaseEntity {
+public abstract class Item extends BaseEntity {
+
+  @ManyToOne
+  @JoinColumn(name = "category_id")
+  private Category category;
 
   private String name;
-  private Long price;
+  private Integer price;
+  private Integer stockQuantity;
 
 }

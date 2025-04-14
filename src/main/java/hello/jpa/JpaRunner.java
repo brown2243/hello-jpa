@@ -21,11 +21,10 @@ public class JpaRunner implements CommandLineRunner {
   @Transactional
   public void run(String... args) throws Exception {
 
-    Member member = new Member();
-    member.setCreatedBy("KIM");
-    member.setCreatedDate(LocalDateTime.now());
-
-    em.persist(member);
+    Book book = new Book();
+    book.setName("JPA");
+    book.setAuthor("김영한");
+    em.persist(book);
 
     // Movie movie = new Movie();
     // movie.setDirector("AAAA");

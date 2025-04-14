@@ -1,11 +1,9 @@
 package hello.jpa.domain;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,9 +14,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Member extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  private String username;
+  @OneToMany(mappedBy = "member")
+  private List<Order> orders;
+
+  private String name;
+  private String city;
+  private String street;
+  private String zipcode;
 
 }

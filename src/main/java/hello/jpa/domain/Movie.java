@@ -10,8 +10,6 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 public class Movie extends Item {
-
   private String director;
   private String actor;
-
 }
