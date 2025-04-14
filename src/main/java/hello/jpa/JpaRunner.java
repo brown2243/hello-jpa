@@ -1,5 +1,6 @@
 package hello.jpa;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
@@ -20,18 +21,24 @@ public class JpaRunner implements CommandLineRunner {
   @Transactional
   public void run(String... args) throws Exception {
 
-    Movie movie = new Movie();
-    movie.setDirector("AAAA");
-    movie.setActor("BBBB");
-    movie.setName("바람과 함께 사라지다");
-    movie.setPrice(10000L);
+    Member member = new Member();
+    member.setCreatedBy("KIM");
+    member.setCreatedDate(LocalDateTime.now());
 
-    em.persist(movie);
+    em.persist(member);
 
-    em.flush();
-    em.clear();
+    // Movie movie = new Movie();
+    // movie.setDirector("AAAA");
+    // movie.setActor("BBBB");
+    // movie.setName("바람과 함께 사라지다");
+    // movie.setPrice(10000L);
 
-    Movie findMovie = em.find(Movie.class, movie.getId());
+    // em.persist(movie);
+
+    // em.flush();
+    // em.clear();
+
+    // Movie findMovie = em.find(Movie.class, movie.getId());
 
     // for (Member m : member.getTeam().getMembers()) {
     // System.out.println("m" + m.getName());
