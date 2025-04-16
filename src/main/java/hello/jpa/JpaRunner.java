@@ -1,18 +1,20 @@
 package hello.jpa;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import hello.jpa.domain.*;
+import hello.jpa.domain.Member;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 
 @Component
 public class JpaRunner implements CommandLineRunner {
+
+  @Autowired
+  private EntityManagerFactory emf;
 
   @PersistenceContext
   private EntityManager em;
@@ -20,11 +22,29 @@ public class JpaRunner implements CommandLineRunner {
   @Override
   @Transactional
   public void run(String... args) throws Exception {
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
 
-    Book book = new Book();
-    book.setName("JPA");
-    book.setAuthor("김영한");
-    em.persist(book);
+    try {
+      tx.begin();
+      //
+      Member member = new Member();
+      member.setName("HELLO");
+      em.persist(member);
+      //
+      tx.commit();
+    } catch (Exception e) {
+      tx.rollback();
+      e.printStackTrace();
+    } finally {
+      em.close();
+    }
+
+    //
+    // Book book = new Book();
+    // book.setName("JPA");
+    // book.setAuthor("김영한");
+    // em.persist(book);
 
     // Movie movie = new Movie();
     // movie.setDirector("AAAA");
