@@ -2,6 +2,7 @@ package hello.jpa.domain;
 
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
@@ -19,7 +20,7 @@ import lombok.Setter;
 // public class Item extends BaseEntity {
 public abstract class Item extends BaseEntity {
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "category_id")
   private Category category;
 

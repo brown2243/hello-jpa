@@ -2,6 +2,7 @@ package hello.jpa.domain;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -17,14 +18,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Category extends BaseEntity {
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+  @OneToMany(mappedBy = "category")
   private List<Item> items;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "parent_id")
   private Category parent;
 
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Category> child;
 
   private String name;
