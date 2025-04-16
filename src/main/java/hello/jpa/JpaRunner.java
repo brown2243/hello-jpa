@@ -5,8 +5,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import hello.jpa.domain.Member;
-import hello.jpa.domain.Team;
+import hello.jpa.domain.Child;
+import hello.jpa.domain.Parent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -29,27 +29,14 @@ public class JpaRunner implements CommandLineRunner {
     try {
       tx.begin();
       //
-      Team team = new Team();
-      team.setName("HELLO");
+      Child child1 = new Child();
+      Child child2 = new Child();
 
-      Member member = new Member();
+      Parent parent = new Parent();
+      parent.addChild(child1);
+      parent.addChild(child2);
 
-      member.setTeam(team);
-      member.setName("WORLD");
-
-      em.persist(team);
-      em.persist(member);
-
-      em.flush();
-      em.clear();
-
-      Member findMember = em.find(Member.class, 5L);
-      System.out.println(findMember.getClass());
-      System.out.println(findMember.getTeam().getClass());
-
-      System.out.println("=".repeat(30));
-      System.out.println(findMember.getTeam().getName());
-      System.out.println("=".repeat(30));
+      em.persist(parent);
       //
       tx.commit();
     } catch (Exception e) {
@@ -58,68 +45,6 @@ public class JpaRunner implements CommandLineRunner {
     } finally {
       em.close();
     }
-
-    //
-    // Book book = new Book();
-    // book.setName("JPA");
-    // book.setAuthor("김영한");
-    // em.persist(book);
-
-    // Movie movie = new Movie();
-    // movie.setDirector("AAAA");
-    // movie.setActor("BBBB");
-    // movie.setName("바람과 함께 사라지다");
-    // movie.setPrice(10000L);
-
-    // em.persist(movie);
-
-    // em.flush();
-    // em.clear();
-
-    // Movie findMovie = em.find(Movie.class, movie.getId());
-
-    // for (Member m : member.getTeam().getMembers()) {
-    // System.out.println("m" + m.getName());
-    // }
-
-    // 조회
-    // Member member = em.find(Member.class, 1L);
-    // Team team2 = em.find(Team.class, 2L);
-
-    // System.out.println(member.getTeam().getName());
-    // // 회원1에 새로운 팀B 설정
-    // member.setTeam(team2);
-    // System.out.println(member.getTeam().getName());
-
-    // List<Member> members = em.createQuery("select m from Member m", Member.class)
-    // .setFirstResult(1)
-
-    // .setMaxResults(8)
-    // .getResultList();
-
-    // for (Member member : members) {
-    // System.out.println("member.name = " + member.getUsername());
-    // }
-
-    // Member member = em.find(Member.class, 1L);
-    // member.setName("hello JPA");
-
-    // // spring이 없으면 아래의 코드가 필요하다
-    // EntityTransaction tx = em.getTransaction();
-    // tx.begin();
-    // try {
-    // Member member = new Member();
-    // member.setId(0L);
-    // member.setName("hello");
-
-    // em.persist(member);
-    // tx.commit();
-
-    // } catch (Exception e) {
-    // tx.rollback();
-    // } finally {
-    // em.close();
-    // }
 
     System.out.println("JpaRunner END!!!!!");
   }
