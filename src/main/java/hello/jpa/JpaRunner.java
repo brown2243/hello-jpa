@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import hello.jpa.domain.Member;
+import hello.jpa.domain.Team;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -16,8 +17,8 @@ public class JpaRunner implements CommandLineRunner {
   @Autowired
   private EntityManagerFactory emf;
 
-  @PersistenceContext
-  private EntityManager em;
+  // @PersistenceContext
+  // private EntityManager em;
 
   @Override
   @Transactional
@@ -28,9 +29,27 @@ public class JpaRunner implements CommandLineRunner {
     try {
       tx.begin();
       //
+      Team team = new Team();
+      team.setName("HELLO");
+
       Member member = new Member();
-      member.setName("HELLO");
+
+      member.setTeam(team);
+      member.setName("WORLD");
+
+      em.persist(team);
       em.persist(member);
+
+      em.flush();
+      em.clear();
+
+      Member findMember = em.find(Member.class, 5L);
+      System.out.println(findMember.getClass());
+      System.out.println(findMember.getTeam().getClass());
+
+      System.out.println("=".repeat(30));
+      System.out.println(findMember.getTeam().getName());
+      System.out.println("=".repeat(30));
       //
       tx.commit();
     } catch (Exception e) {
