@@ -5,7 +5,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import hello.jpa.domain.Address;
 import hello.jpa.domain.Child;
+import hello.jpa.domain.Member;
 import hello.jpa.domain.Parent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -28,15 +30,13 @@ public class JpaRunner implements CommandLineRunner {
 
     try {
       tx.begin();
+      Member member = new Member();
+      Address address = new Address();
+      address.setCity("hello");
+      address.setStreet("world");
+      member.setHomeAddress(address);
       //
-      Child child1 = new Child();
-      Child child2 = new Child();
-
-      Parent parent = new Parent();
-      parent.addChild(child1);
-      parent.addChild(child2);
-
-      em.persist(parent);
+      em.persist(member);
       //
       tx.commit();
     } catch (Exception e) {

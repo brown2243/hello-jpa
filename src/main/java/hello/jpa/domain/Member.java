@@ -1,5 +1,9 @@
 package hello.jpa.domain;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -22,8 +26,18 @@ public class Member extends BaseEntity {
   private Team team;
 
   private String name;
-  private String city;
-  private String street;
-  private String zipcode;
+
+  @Embedded
+  private Address homeAddress;
+
+  @Embedded
+  @AttributeOverrides({
+      @AttributeOverride(name = "city", column = @Column(name = "work_city")),
+      @AttributeOverride(name = "street", column = @Column(name = "work_street")),
+      @AttributeOverride(name = "zipcode", column = @Column(name = "work_zipcode")),
+  })
+  private Address workAddress;
+  @Embedded
+  private Period workPeriod;
 
 }
