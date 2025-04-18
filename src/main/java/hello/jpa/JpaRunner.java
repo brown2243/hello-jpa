@@ -1,11 +1,14 @@
 package hello.jpa;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import hello.jpa.domain.Address;
+import hello.jpa.domain.AddressEntity;
 import hello.jpa.domain.Child;
 import hello.jpa.domain.Member;
 import hello.jpa.domain.Parent;
@@ -41,8 +44,8 @@ public class JpaRunner implements CommandLineRunner {
       member.getFavoriteFoods().add("족발");
       member.getFavoriteFoods().add("피자");
 
-      member.getAddressHistory().add(new Address("old1", "street1", "10000"));
-      member.getAddressHistory().add(new Address("old2", "street1", "10000"));
+      member.getAddressHistory().add(new AddressEntity(new Address("old1", "street1", "10000")));
+      member.getAddressHistory().add(new AddressEntity(new Address("old2", "street1", "10000")));
 
       //
       em.persist(member);
@@ -62,6 +65,11 @@ public class JpaRunner implements CommandLineRunner {
       findMember.getFavoriteFoods().remove("치킨");
       findMember.getFavoriteFoods().add("한식");
 
+      // More formally, removes the element with
+      // * the lowest index {@code i} such that
+      // * {@code Objects.equals(o, get(i))}
+
+      findMember.getAddressHistory().remove(new AddressEntity(new Address("old1", "street1", "10000")));
       //
       tx.commit();
     } catch (Exception e) {
