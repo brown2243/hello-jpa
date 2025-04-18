@@ -27,7 +27,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-public class delivery extends BaseEntity {
+public class Delivery extends BaseEntity {
 
   // @OneToMany(mappedBy = "member")
   // private List<Order> orders;

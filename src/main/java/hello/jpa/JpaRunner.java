@@ -1,7 +1,5 @@
 package hello.jpa;
 
-import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -9,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import hello.jpa.domain.Address;
 import hello.jpa.domain.AddressEntity;
-import hello.jpa.domain.Child;
 import hello.jpa.domain.Member;
-import hello.jpa.domain.Parent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -50,27 +46,6 @@ public class JpaRunner implements CommandLineRunner {
       //
       em.persist(member);
 
-      em.flush();
-      em.clear();
-
-      Member findMember = em.find(Member.class, 1L);
-
-      // // 갑타입 변경 - bad case
-      // findMember.getHomeAddress().setCity("newCity");
-      // 갑타입 변경 - good case
-      Address a = findMember.getHomeAddress();
-      findMember.setHomeAddress(new Address("newCity", a.getStreet(), a.getZipcode()));
-
-      // 이거는 업데이트가 없다
-      findMember.getFavoriteFoods().remove("치킨");
-      findMember.getFavoriteFoods().add("한식");
-
-      // More formally, removes the element with
-      // * the lowest index {@code i} such that
-      // * {@code Objects.equals(o, get(i))}
-
-      findMember.getAddressHistory().remove(new AddressEntity(new Address("old1", "street1", "10000")));
-      //
       tx.commit();
     } catch (Exception e) {
       tx.rollback();
