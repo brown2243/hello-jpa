@@ -1324,3 +1324,5 @@ findMember.getAddressHistory().remove(new Address("old1", "street1", "10000"));
 - **식별자가 필요하고, 지속해서 값을 추적, 변경해야 한다면 그것은 값 타입이 아닌 엔티티**
 
 ## 실전 예제 6 - 값 타입 매핑
+
+- JPA는 프록시 객체를 사용하기에, 직접 값 접근이 아닌 getter를 통해 값 접근을 해야한다.
