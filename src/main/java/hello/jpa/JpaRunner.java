@@ -31,12 +31,37 @@ public class JpaRunner implements CommandLineRunner {
     try {
       tx.begin();
       Member member = new Member();
+
       Address address = new Address();
       address.setCity("hello");
       address.setStreet("world");
       member.setHomeAddress(address);
+
+      member.getFavoriteFoods().add("치킨");
+      member.getFavoriteFoods().add("족발");
+      member.getFavoriteFoods().add("피자");
+
+      member.getAddressHistory().add(new Address("old1", "street1", "10000"));
+      member.getAddressHistory().add(new Address("old2", "street1", "10000"));
+
       //
       em.persist(member);
+
+      em.flush();
+      em.clear();
+
+      Member findMember = em.find(Member.class, 1L);
+
+      // // 갑타입 변경 - bad case
+      // findMember.getHomeAddress().setCity("newCity");
+      // 갑타입 변경 - good case
+      Address a = findMember.getHomeAddress();
+      findMember.setHomeAddress(new Address("newCity", a.getStreet(), a.getZipcode()));
+
+      // 이거는 업데이트가 없다
+      findMember.getFavoriteFoods().remove("치킨");
+      findMember.getFavoriteFoods().add("한식");
+
       //
       tx.commit();
     } catch (Exception e) {

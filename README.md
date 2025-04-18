@@ -1243,6 +1243,41 @@ dType이 기본
 
 ## 값 타입의 비교
 
+- **동일성(identity) 비교: 인스턴스의 참조 값을 비교, == 사용**
+- **동등성(equivalence) 비교: 인스턴스의 값을 비교, equals() 사용**
+  - equals 기본은 == 비교
+  - override 해야함 - 왠만하면 자동으로 생성되는 것을 사용할 것
+- 값 타입은 a.equals(b)를 사용해서 동등성 비교를 해야 함
+- 값 타입의 equals() 메소드를 적절하게 재정의(주로 모든 필드사용)
+
 ## 값 타입 컬렉션
+
+- RDB는 기본적으로 컬렉션을 못넣는다(원자성)
+  - 컬렉션은 일대다 개념
+  - 요즘은 JSON 지원
+-
+
+- 값 타입을 하나 이상 저장할 때 사용
+- @ElementCollection, @CollectionTable 사용
+- 데이터베이스는 컬렉션을 같은 테이블에 저장할 수 없다.
+- 컬렉션을 저장하기 위한 별도의 테이블이 필요함
+
+### 값 타입 컬렉션 사용
+
+- 값 타입 저장 예제
+- 값 타입 조회 예제
+- **값 타입 컬렉션도 지연 로딩 전략 사용**
+  - **값 타입 컬렉션은 지연 로딩이 기본이다!**
+- 값 타입 수정 예제
+- **값 타입 컬렉션은 라이프 사이클이 없다(엔티티 따라감)**
+  - 참고: 값 타입 컬렉션은 영속성 전에(Cascade) + 고아 객체 제거 기능을 필수로 가진다고 볼 수 있다.
+
+```java
+// 갑타입 변경 - bad case
+findMember.getHomeAddress().setCity("newCity");
+// 갑타입 변경 - good case
+Address a = findMember.getHomeAddress();
+findMember.setHomeAddress(new Address("newCity", a.getStreet(), a.getZipcode()));
+```
 
 ## 실전 예제 6 - 값 타입 매핑
