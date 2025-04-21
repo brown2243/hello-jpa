@@ -34,26 +34,40 @@ public class JpaRunner implements CommandLineRunner {
     try {
       tx.begin();
 
-      for (int i = 0; i < 100; i++) {
-        Member member = new Member();
-        member.setUsername("hello" + i);
-        member.setAge(i);
+      Team team = new Team();
+      team.setName("teamA");
+      em.persist(team);
+      Member member = new Member();
+      member.setUsername("hello");
+      member.setAge(20);
+      member.setTeam(team);
 
-        em.persist(member);
-      }
+      // for (int i = 0; i < 100; i++) {
+      // Member member = new Member();
+      // member.setUsername("hello" + i);
+      // member.setAge(i);
+      // member.setTeam(team);
+
+      // em.persist(member);
+      // }
 
       em.flush();
       em.clear();
 
       List<Member> resultList = em.createQuery(
-          "select m from Member m order by m.age desc",
+          "select m from Member m left join m.team t ",
           Member.class)
-          .setFirstResult(0)
-          .setMaxResults(10)
           .getResultList();
 
-      System.out.println(resultList.size());
-      resultList.forEach(member -> System.out.println(member.toString()));
+      // List<Member> resultList = em.createQuery(
+      // "select m from Member m order by m.age desc",
+      // Member.class)
+      // .setFirstResult(0)
+      // .setMaxResults(10)
+      // .getResultList();
+
+      // System.out.println(resultList.size());
+      // resultList.forEach(member -> System.out.println(member.toString()));
 
       tx.commit();
     } catch (Exception e) {

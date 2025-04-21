@@ -1466,7 +1466,43 @@ findMember.getAddressHistory().remove(new Address("old1", "street1", "10000"));
 
 ## 페이징
 
+- JPA는 페이징을 다음 두 API로 추상화
+- setFirstResult(int startPosition) : 조회 시작 위치 (0부터 시작)
+- setMaxResults(int maxResult) : 조회할 데이터 수
+
 ## 조인
+
+- 내부 조인: `SELECT m FROM Member m [INNER] JOIN m.team t`
+- 외부 조인: `SELECT m FROM Member m LEFT [OUTER] JOIN m.team t`
+- 세타 조인: `select count(m) from Member m, Team t where m.username = t.name`
+
+1. 내부 조인 (INNER JOIN): 두 테이블에서 조인 조건을 만족하는 행들만 결과로 반환.
+   - 조건에 맞지 않으면 무시됨.
+   - 기본적으로 사용. 속도 빠르고 의도 명확.
+2. 외부 조인 (OUTER JOIN): 한쪽(또는 양쪽) 테이블에 매칭되는 행이 없어도 결과에 포함.
+
+   - 선택적 매칭이 필요할 때 (예: 없는 값도 보여주기).
+   - LEFT OUTER JOIN: 왼쪽 테이블은 무조건 포함, 오른쪽에 매칭 안 되면 NULL
+   - RIGHT OUTER JOIN: 오른쪽 테이블은 무조건 포함
+   - FULL OUTER JOIN: 양쪽 테이블의 모든 행 포함 (MySQL은 지원하지 않음, 대신 UNION 사용)
+
+3. 세타 조인 (Theta JOIN): 두 테이블 간 = (등호) 외의 비교 연산자를 사용하는 조인
+   - `> , <, !=, >=, <=, <>` 등을 사용 가능
+   - 조건이 등치가 아닌 경우만 사용. 주로 분석용 쿼리에서 활용.
+
+```sql
+--  조건이 단순 등치가 아니기 때문에 세타 조인
+-- 일반적으로 INNER JOIN과 함께 사용됨 (즉, 내부 조인의 특수한 형태)
+SELECT *
+FROM employee e
+JOIN department d ON e.salary > d.budget;
+```
+
+### 조인 - ON 절
+
+- ON절을 활용한 조인(JPA 2.1부터 지원)
+- 1. 조인 대상 필터링
+- 2. **연관관계 없는 엔티티 외부 조인(하이버네이트 5.1부터)**
 
 ## 서브 쿼리
 

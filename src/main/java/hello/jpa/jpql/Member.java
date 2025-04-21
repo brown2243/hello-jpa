@@ -1,6 +1,7 @@
 package hello.jpa.jpql;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +22,7 @@ public class Member {
   private String username;
   private int age;
 
-  @ManyToOne()
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "team_id")
   private Team team;
 
@@ -29,4 +30,10 @@ public class Member {
   public String toString() {
     return "Member [id=" + id + ", username=" + username + ", age=" + age + "]";
   }
+
+  public void changeTeam(Team team) {
+    setTeam(team);
+    team.getMembers().add(this);
+  }
+
 }
