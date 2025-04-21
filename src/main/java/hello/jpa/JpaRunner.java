@@ -1,5 +1,7 @@
 package hello.jpa;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -29,22 +31,11 @@ public class JpaRunner implements CommandLineRunner {
 
     try {
       tx.begin();
-      Member member = new Member();
 
-      Address address = new Address();
-      address.setCity("hello");
-      address.setStreet("world");
-      member.setHomeAddress(address);
-
-      member.getFavoriteFoods().add("치킨");
-      member.getFavoriteFoods().add("족발");
-      member.getFavoriteFoods().add("피자");
-
-      member.getAddressHistory().add(new AddressEntity(new Address("old1", "street1", "10000")));
-      member.getAddressHistory().add(new AddressEntity(new Address("old2", "street1", "10000")));
-
-      //
-      em.persist(member);
+      List<Member> result = em.createQuery(
+          "select m from Member m  where m.name like '%kim%' ",
+          Member.class)
+          .getResultList();
 
       tx.commit();
     } catch (Exception e) {
