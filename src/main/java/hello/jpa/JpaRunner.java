@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import hello.jpa.jpql.Member;
+import hello.jpa.jpql.Order;
+import hello.jpa.jpql.Team;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -34,30 +36,29 @@ public class JpaRunner implements CommandLineRunner {
 
       Member member = new Member();
       member.setUsername("hello");
+      member.setAge(25);
       em.persist(member);
 
       em.flush();
       em.clear();
 
-      // TypedQuery<Member> query1 = em.createQuery("select m from Member as m",
-      // Member.class);
-      // TypedQuery<String> query2 = em.createQuery("select m.username from Member as
-      // m", String.class);
-      // Query query3 = em.createQuery("select m.username, m.age from Member as m");
-      TypedQuery<Member> query4 = em.createQuery("select m from Member as m where m.username = :username",
-          Member.class);
-      query4.setParameter("username", "hello");
-      System.out.println(query4.getSingleResult().getUsername());
+      List<Member> resultList = em.createQuery("select m from Member as m",
+          Member.class).getResultList();
 
-      // query4.setParameter(0, "hello");
+      // bad case
+      // 묵시적 조인
+      // join이 나가는 지 예측하기 어렵다
+      em.createQuery("select m.team from Member m", Team.class);
 
-      // List<Member> resultList = query1.getResultList();
-      // for (Member m : resultList) {
-      // System.out.println(m);
-      // }
+      // good case
+      // 명시적 조인
+      em.createQuery("select t from Member m join m.team t", Team.class);
 
-      // Member singleResult = query1.getSingleResult();
-      // System.out.println(singleResult);
+      // order 안의 값 타입
+      em.createQuery("select o.address from Order o ", Order.class);
+
+      Member member2 = resultList.get(0);
+      member2.setAge(20);
 
       tx.commit();
     } catch (Exception e) {
