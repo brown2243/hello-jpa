@@ -7,12 +7,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import hello.jpa.domain.Address;
-import hello.jpa.domain.AddressEntity;
-import hello.jpa.domain.Member;
+import hello.jpa.jpql.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 @Component
 public class JpaRunner implements CommandLineRunner {
@@ -32,10 +32,32 @@ public class JpaRunner implements CommandLineRunner {
     try {
       tx.begin();
 
-      List<Member> result = em.createQuery(
-          "select m from Member m  where m.name like '%kim%' ",
-          Member.class)
-          .getResultList();
+      Member member = new Member();
+      member.setUsername("hello");
+      em.persist(member);
+
+      em.flush();
+      em.clear();
+
+      // TypedQuery<Member> query1 = em.createQuery("select m from Member as m",
+      // Member.class);
+      // TypedQuery<String> query2 = em.createQuery("select m.username from Member as
+      // m", String.class);
+      // Query query3 = em.createQuery("select m.username, m.age from Member as m");
+      TypedQuery<Member> query4 = em.createQuery("select m from Member as m where m.username = :username",
+          Member.class);
+      query4.setParameter("username", "hello");
+      System.out.println(query4.getSingleResult().getUsername());
+
+      // query4.setParameter(0, "hello");
+
+      // List<Member> resultList = query1.getResultList();
+      // for (Member m : resultList) {
+      // System.out.println(m);
+      // }
+
+      // Member singleResult = query1.getSingleResult();
+      // System.out.println(singleResult);
 
       tx.commit();
     } catch (Exception e) {

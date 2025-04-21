@@ -1,7 +1,6 @@
-package hello.jpa.domain;
+package hello.jpa.jpql;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,13 +12,17 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Child {
-  @Id
-  @GeneratedValue
-  private Long id;
-  private String name;
+public class Member {
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parent_id")
-  private Parent parent;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String username;
+  private int age;
+
+  @ManyToOne()
+  @JoinColumn(name = "team_id")
+  private Team team;
+
 }
