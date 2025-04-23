@@ -61,25 +61,32 @@ public class JpaRunner implements CommandLineRunner {
       em.flush();
       em.clear();
 
-      // select m from Member m
-      // select m from Member m join fetch m.team
-      String query = """
-          select t from Team t join fetch t.members
-          """;
+      List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+          .setParameter("username", "mem1").getResultList();
 
-      List<Team> result = em.createQuery(
-          query,
-          Team.class).getResultList();
-
-      for (Team team : result) {
-        System.out.println("team = " + team.getName() + ", " + team.getMembers().size());
-        // 회원1, 팀 A SQL
-        // 회원2, 팀 A 1차캐시
-        // 회원3, 팀 B SQL
-
-        // 회원 100명 -> N + 1(1은 처음 날린 쿼리, 그 쿼리의 결과로 N번 만큼 쿼리를 날리는 것을 N + 1 문제라 함)
-        // 페치 조인을 하면 프록시가 아닌 실제 엔티티를 받아옴
+      for (Member member : resultList) {
+        System.out.println(member);
       }
+      // // select m from Member m
+      // // select m from Member m join fetch m.team
+      // String query = """
+      // select t from Team t join fetch t.members
+      // """;
+
+      // List<Team> result = em.createQuery(
+      // query,
+      // Team.class).getResultList();
+
+      // for (Team team : result) {
+      // System.out.println("team = " + team.getName() + ", " +
+      // team.getMembers().size());
+      // // 회원1, 팀 A SQL
+      // // 회원2, 팀 A 1차캐시
+      // // 회원3, 팀 B SQL
+
+      // // 회원 100명 -> N + 1(1은 처음 날린 쿼리, 그 쿼리의 결과로 N번 만큼 쿼리를 날리는 것을 N + 1 문제라 함)
+      // // 페치 조인을 하면 프록시가 아닌 실제 엔티티를 받아옴
+      // }
 
       tx.commit();
     } catch (Exception e) {

@@ -1740,8 +1740,72 @@ select NULLIF(m.username, '관리자') from Member m
 
 ## 다형성 쿼리
 
+### TYPE
+
+- 조회 대상을 특정 자식으로 한정
+- 예) Item 중에 Book, Movie를 조회해라
+- [JPQL]
+  select i from Item i
+  where type(i) IN (Book, Movie)
+- [SQL]
+  select i from i
+  where i.DTYPE in (‘B’, ‘M’)
+
+### TREAT(JPA 2.1)
+
+- 예) 부모인 Item과 자식 Book이 있다.
+- [JPQL]
+  select i from Item i
+  where treat(i as Book).author = ‘kim’
+- [SQL]
+  select i.\* from Item i
+  where i.DTYPE = ‘B’ and i.author = ‘kim’
+
 ## 엔티티 직접 사용
+
+- **JPQL에서 엔티티를 직접 사용하면 SQL에서 해당 엔티티의 기본 키 값을 사용**
+- 디비 입장에서는 객체의 식별자(pk or fk)와 매칭
+- [JPQL]
+  select count(m.id) from Member m //엔티티의 아이디를 사용
+  select count(m) from Member m //엔티티를 직접 사용
+
+- [SQL](JPQL 둘다 같은 다음 SQL 실행)
+  select count(m.id) as cnt from Member m
 
 ## Named 쿼리
 
+- **미리 정의해서 이름을 부여해두고 사용하는 JPQL**
+- **정적 쿼리**
+- 어노테이션, XML에 정의
+- 애플리케이션 로딩 시점에 초기화 후 재사용
+  - 이게 진짜 장점?
+  - 매번 만들지 않음
+- 애플리케이션 로딩 시점에 쿼리를 검증
+
+  - 런타임오류보단 로딩시점에 나는 오류가 나음
+
+- Spring data JPA `@Query`로 등록하는 쿼리들이 다 namedQuery로 등록(이름은 없는)
+
 ## 벌크 연산
+
+- 재고가 10개 미만인 모든 상품의 가격을 10% 상승하려면?
+- **JPA 변경 감지 기능으로 실행하려면 너무 많은 SQL 실행**
+- 1. 재고가 10개 미만인 상품을 리스트로 조회한다.
+- 2. 상품 엔티티의 가격을 10% 증가한다.
+- 3. 트랜잭션 커밋 시점에 변경감지가 동작한다.
+- 변경된 데이터가 100건이라면 100번의 UPDATE SQL 실행
+- JPA는 실시간 단건단건에 더 최적화 되어있음
+
+- **쿼리 한 번으로 여러 테이블 로우 변경(엔티티)**
+- **executeUpdate()의 결과는 영향받은 엔티티 수 반환**
+- UPDATE, DELETE 지원
+- INSERT(insert into .. select, 하이버네이트 지원)
+
+- **벌크 연산은 영속성 컨텍스트를 무시하고 데이터베이스에 직접 쿼리**
+- 벌크 연산을 먼저 실행
+- 벌크 연산 수행 후 영속성 컨텍스트 초기화
+
+- spring data jpa @Modifying 어노테이션은 영속성 컨텍스트를 클리어 해줌
+  - 쿼리 실행 이후
+  - 가능한 벌크 쿼리는 트랜잭션 마지막 시점에 실행
+  - 아니면 벌크 전이나 후에 clear 명시적으로 호출하기
