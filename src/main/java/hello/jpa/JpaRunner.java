@@ -34,52 +34,52 @@ public class JpaRunner implements CommandLineRunner {
     try {
       tx.begin();
 
-      Team team = new Team();
-      team.setName("teamA");
-      em.persist(team);
-      Member member = new Member();
-      member.setUsername("hello");
-      member.setAge(20);
-      member.setTeam(team);
+      Team teamA = new Team();
+      teamA.setName("teamA");
+      Team teamB = new Team();
+      teamB.setName("teamB");
 
-      // for (int i = 0; i < 100; i++) {
-      // Member member = new Member();
-      // member.setUsername("hello" + i);
-      // member.setAge(i);
-      // member.setTeam(team);
+      Member member1 = new Member();
+      member1.setUsername("mem1");
+      member1.setAge(20);
+      member1.setTeam(teamA);
+      Member member2 = new Member();
+      member2.setUsername("mem2");
+      member2.setAge(20);
+      member2.setTeam(teamA);
+      Member member3 = new Member();
+      member3.setUsername("mem3");
+      member3.setAge(30);
+      member3.setTeam(teamB);
 
-      // em.persist(member);
-      // }
+      em.persist(teamA);
+      em.persist(teamB);
+      em.persist(member1);
+      em.persist(member2);
+      em.persist(member3);
 
       em.flush();
       em.clear();
 
+      // select m from Member m
+      // select m from Member m join fetch m.team
       String query = """
-          select
-              case
-                  when m.age <= 10 then '학생요금'
-                  when m.age >= 60 then '경로요금'
-                  else '일반요금'
-              end
-          from Member m
+          select t from Team t join fetch t.members
           """;
 
-      List<String> result = em.createQuery(
+      List<Team> result = em.createQuery(
           query,
-          String.class).getResultList();
-      for (String string : result) {
-        System.out.println(string);
+          Team.class).getResultList();
+
+      for (Team team : result) {
+        System.out.println("team = " + team.getName() + ", " + team.getMembers().size());
+        // 회원1, 팀 A SQL
+        // 회원2, 팀 A 1차캐시
+        // 회원3, 팀 B SQL
+
+        // 회원 100명 -> N + 1(1은 처음 날린 쿼리, 그 쿼리의 결과로 N번 만큼 쿼리를 날리는 것을 N + 1 문제라 함)
+        // 페치 조인을 하면 프록시가 아닌 실제 엔티티를 받아옴
       }
-
-      // List<Member> resultList = em.createQuery(
-      // "select m from Member m order by m.age desc",
-      // Member.class)
-      // .setFirstResult(0)
-      // .setMaxResults(10)
-      // .getResultList();
-
-      // System.out.println(resultList.size());
-      // resultList.forEach(member -> System.out.println(member.toString()));
 
       tx.commit();
     } catch (Exception e) {
