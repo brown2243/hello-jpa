@@ -54,10 +54,22 @@ public class JpaRunner implements CommandLineRunner {
       em.flush();
       em.clear();
 
-      List<Member> resultList = em.createQuery(
-          "select m from Member m left join m.team t ",
-          Member.class)
-          .getResultList();
+      String query = """
+          select
+              case
+                  when m.age <= 10 then '학생요금'
+                  when m.age >= 60 then '경로요금'
+                  else '일반요금'
+              end
+          from Member m
+          """;
+
+      List<String> result = em.createQuery(
+          query,
+          String.class).getResultList();
+      for (String string : result) {
+        System.out.println(string);
+      }
 
       // List<Member> resultList = em.createQuery(
       // "select m from Member m order by m.age desc",
