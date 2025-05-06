@@ -1508,6 +1508,8 @@ JOIN department d ON e.salary > d.budget;
 
 - **메인 쿼리와 서브 쿼리가 상관없게 짜야 성능이 좋다**
 - **하이버네이트6 부터는 FROM 절의 서브쿼리를 지원**
+- JPQL(Java Persistence Query Language) 표준 명세에서는 서브쿼리(Subquery)의 사용을 다음과 같이 제한합니다:
+  - 허용된 위치:WHERE 절,HAVING 절
 
 ### 서브 쿼리 지원 함수
 
@@ -1752,6 +1754,8 @@ select NULLIF(m.username, '관리자') from Member m
   where i.DTYPE in (‘B’, ‘M’)
 
 ### TREAT(JPA 2.1)
+
+- JPQL의 TREAT 키워드는 상속 구조에서 부모 타입 엔티티를 지정된 자식 타입으로 취급하여 자식 타입에만 있는 속성에 접근할 수 있게 해준답니다.
 
 - 예) 부모인 Item과 자식 Book이 있다.
 - [JPQL]
