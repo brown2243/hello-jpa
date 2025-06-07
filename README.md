@@ -1,4 +1,4 @@
-# 1. 강좌 소개
+# 1. [강좌 소개](https://www.inflearn.com/course/ORM-JPA-Basic)
 
 - 시작일 250407
 
